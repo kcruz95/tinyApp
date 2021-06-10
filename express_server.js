@@ -55,10 +55,41 @@ app.post("/urls", (req, res) => {
 });
 
 function generateRandomString() {
-  return Math.random().toString(36).substr(2, 6)
+  const result = "";
+  const inputChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  const charLength = inputChars.length;
+  for (i = 0; i < length; i = i + 1) {
+    result += inputChars.charAt(Math.floor(Math.random() * charLength));
+  }
+  return 
 };
 
 app.get("/u/:shortURL", (req, res) => {
   // const longURL = ...
   res.redirect(longURL);
+});
+
+const users = { 
+  "Dimitriy": {
+    id: "dm3", 
+    email: "user@example.com", 
+    password: "abc123"
+  },
+ "Kakao": {
+    id: "kaka0User1", 
+    email: "user2@example.com", 
+    password: "zyx262524"
+  }
+}
+
+app.get("/register", (req, res) => {
+  const templateVars = {email: ""};
+  res.render("register", templateVars);
+  }
+);
+
+app.post("/register", (req, res) => {
+  const email = req.body.email;
+  const password = req.body.password;
+  console.log("email=", email, "password", password)
 });
