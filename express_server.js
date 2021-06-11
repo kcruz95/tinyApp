@@ -10,11 +10,7 @@ const urlDatabase = {
 };
 
 const bodyParser = require("body-parser");
-app.use(bodyParser.urlencoded({extended: true}));
-
-app.get("/", (req, res) => {
-  res.send("Hello!");
-});
+app.use(express.urlencoded({extended: true}));
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
@@ -23,17 +19,6 @@ app.listen(PORT, () => {
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
-
-/*
-// app.get("/set", (req, res) => {
-//   const a = 1;
-//   res.send(`a = ${a}`);
-//  });
- 
-//  app.get("/fetch", (req, res) => {
-//   res.send(`a = ${a}`);
-//  });
-*/
 
  app.get("/urls/new", (req, res) => {
   res.render("urls_new");
@@ -44,14 +29,20 @@ app.get("/urls.json", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
+app.post("/urls", (req, res) => {
+  console.log(req.body); // Log the POST request body to the console
+  res.send("Ok"); // Respond with 'Ok' (we will replace this)
+});
+
 app.get("/u/:shortURL", (req, res) => {
+  // make this more dynamic instead of hard coding
   const templateVars = { shortURL: req.params.shortURL, longURL: "http://localhost:8080/urls/b2xVn2" };
   res.render("urls_show", templateVars);
 });
 
-app.post("/urls", (req, res) => {
-  console.log(req.body);  // Log the POST request body to the console
-  res.send("Ok");         // Respond with 'Ok' (we will replace this)
+app.get("/u/:shortURL", (req, res) => {
+  // const longURL = ...
+  res.redirect(longURL);
 });
 
 function generateRandomString() {
@@ -63,11 +54,6 @@ function generateRandomString() {
   }
   return 
 };
-
-app.get("/u/:shortURL", (req, res) => {
-  // const longURL = ...
-  res.redirect(longURL);
-});
 
 const users = { 
   "Dimitriy": {
@@ -84,7 +70,7 @@ const users = {
 
 app.get("/register", (req, res) => {
   const templateVars = {email: ""};
-  res.render("register", templateVars);
+  res.render("urls_register", templateVars);
   }
 );
 
@@ -93,3 +79,21 @@ app.post("/register", (req, res) => {
   const password = req.body.password;
   console.log("email=", email, "password", password)
 });
+
+app.get("/login", (req, res) => {
+  const templateVars = {email: ""};
+  res.render("urls_login", templateVars);
+  }
+);
+
+app.post("/register", (req, res) => {
+  const email = req.body.email;
+  const password = req.body.password;
+  console.log("email=", email, "password", password)
+});
+
+//POST Login
+// 1. We are going to receive the email and password
+// 2. We will validate and check the email and password in the UsersDatabase that they exist and are ok.
+// 3. If they are good, we write a cookie and then redirect to the /urls
+// 4. Else, then we res.send("Sorry the username or password does not match")
