@@ -9,6 +9,27 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const users = { 
+  "Dimitriy": {
+    id: "dm3", 
+    email: "1@1.com", 
+    password: "1"
+  },
+ "Kakao": {
+    id: "kaka0User1", 
+    email: "2@2.com", 
+    password: "2"
+   }
+}
+
+const emailChecker =(email, users) => {
+  for (let user in users) {
+    if (email === users[user].email) {
+      return users[user];
+    }
+  } return false;
+}
+
 const bodyParser = require("body-parser");
 app.use(express.urlencoded({extended: true}));
 
@@ -55,19 +76,6 @@ function generateRandomString() {
   return 
 };
 
-const users = { 
-  "Dimitriy": {
-    id: "dm3", 
-    email: "user@example.com", 
-    password: "abc123"
-  },
- "Kakao": {
-    id: "kaka0User1", 
-    email: "user2@example.com", 
-    password: "zyx262524"
-  }
-}
-
 app.get("/register", (req, res) => {
   const templateVars = {email: ""};
   res.render("urls_register", templateVars);
@@ -86,10 +94,23 @@ app.get("/login", (req, res) => {
   }
 );
 
-app.post("/register", (req, res) => {
+app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   console.log("email=", email, "password", password)
+  if (!email || !password) {
+    res.send ("Please enter your username and password");
+  }
+  if (email && password) {
+    const user = emailChecker(email, users);
+    if (password === user.password) {
+      res.cookie("userId", user.id);
+    } else {
+      res.send("Incorrect password!");
+    }
+  } 
+
+  res.redirect("/urls");
 });
 
 //POST Login

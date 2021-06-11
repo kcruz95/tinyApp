@@ -6,15 +6,19 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
-        <form method="POST" action="/urls/9sm5xK/login">
+        <!-- <form method="POST" action="/login"> -->
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
-      </form>
+        <!-- </form> -->
       </div>
     </div>
 
-    <form method="POST" action="/login">
-      <button type="submit">Log In</button>
-    </form>    
+    <a href="/login" class="btn btn-primary">
+      Log In
+    </a>
+    <!-- commenting this back in puts the register button in the MyURLs page
+      <a href="/register" class="btn btn-primary">
+      Register
+    </a> -->
   </nav>
 </header>
