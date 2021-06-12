@@ -67,13 +67,14 @@ app.get("/u/:shortURL", (req, res) => {
 });
 
 function generateRandomString() {
-  const result = "";
+  let result = "";
   const inputChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   const charLength = inputChars.length;
+  const length = 8;
   for (i = 0; i < length; i = i + 1) {
     result += inputChars.charAt(Math.floor(Math.random() * charLength));
   }
-  return 
+  return result;
 };
 
 app.get("/register", (req, res) => {
@@ -85,8 +86,25 @@ app.get("/register", (req, res) => {
 app.post("/register", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
+  const id = generateRandomString(8)
   console.log("email=", email, "password", password)
-});
+  if (!email || !password) {
+    res.send ("Please enter a valid email and password");
+  } else {
+    users[id] = {
+      id,
+      email,
+      password
+    };
+    
+    res.cookie("userId", id);
+
+    res.redirect("/urls");
+    //assign user obj info it needs (userid for key)
+    // res.send("Incorrect password!");
+  }
+}
+);
 
 app.get("/login", (req, res) => {
   const templateVars = {email: ""};
