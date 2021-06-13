@@ -1,8 +1,14 @@
 const express = require("express");
+// const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
 const app = express();
 const PORT = 8080; // default port 8080
 
 app.set("view engine", "ejs");
+
+app.use(express.urlencoded({extended: true}));
+// app.use(bodyParser());
+app.use(cookieParser());
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -15,11 +21,11 @@ const users = {
     email: "1@1.com", 
     password: "1"
   },
- "Kakao": {
+  "Kakao": {
     id: "kaka0User1", 
     email: "2@2.com", 
     password: "2"
-   }
+  }
 }
 
 const emailChecker =(email, users) => {
@@ -30,9 +36,6 @@ const emailChecker =(email, users) => {
   } return false;
 }
 
-const bodyParser = require("body-parser");
-app.use(express.urlencoded({extended: true}));
-
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
@@ -42,12 +45,19 @@ app.get("/urls.json", (req, res) => {
 });
 
  app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const templateVars = {
+    urls: urlDatabase,
+    username: req.cookies.username
+  };
+    res.render("urls_new", templateVars);
 });
 
  app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase };
-  res.render("urls_index", templateVars);
+  const templateVars = {
+    urls: urlDatabase,
+    username: req.cookies.username
+  };
+    res.render("urls_index", templateVars);
 });
 
 app.post("/urls", (req, res) => {
@@ -57,7 +67,11 @@ app.post("/urls", (req, res) => {
 
 app.get("/u/:shortURL", (req, res) => {
   // make this more dynamic instead of hard coding
-  const templateVars = { shortURL: req.params.shortURL, longURL: "http://localhost:8080/urls/b2xVn2" };
+  const templateVars = {
+    shortURL: req.params.shortURL,
+    longURL: "http://localhost:8080/urls/b2xVn2",
+    username: req.cookies.username
+  };
   res.render("urls_show", templateVars);
 });
 
@@ -78,7 +92,10 @@ function generateRandomString() {
 };
 
 app.get("/register", (req, res) => {
-  const templateVars = {email: ""};
+  const templateVars = {
+    email: "",
+    username: req.cookies.username
+  };
   res.render("urls_register", templateVars);
   }
 );
@@ -107,26 +124,32 @@ app.post("/register", (req, res) => {
 );
 
 app.get("/login", (req, res) => {
-  const templateVars = {email: ""};
+  const templateVars = {
+    email: "",
+    username: req.cookies.username
+  };
   res.render("urls_login", templateVars);
   }
 );
 
 app.post("/login", (req, res) => {
-  const email = req.body.email;
-  const password = req.body.password;
-  console.log("email=", email, "password", password)
-  if (!email || !password) {
-    res.send ("Please enter your username and password");
-  }
-  if (email && password) {
-    const user = emailChecker(email, users);
-    if (password === user.password) {
-      res.cookie("userId", user.id);
-    } else {
-      res.send("Incorrect password!");
-    }
-  } 
+  const username = req.body.username;
+  res.cookie("username", username);
+  console.log(username);
+  // const email = req.body.email;
+  // const password = req.body.password;
+  // console.log("email=", email, "password", password)
+  // if (!email || !password) {
+  //   res.send ("Please enter your username and password");
+  // }
+  // if (email && password) {
+  //   const user = emailChecker(email, users);
+  //   if (password === user.password) {
+  //     res.cookie("userId", user.id);
+  //   } else {
+  //     res.send("Incorrect password!");
+  //   }
+  // } 
 
   res.redirect("/urls");
 });
