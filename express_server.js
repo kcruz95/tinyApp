@@ -159,3 +159,17 @@ app.post("/login", (req, res) => {
 // 2. We will validate and check the email and password in the UsersDatabase that they exist and are ok.
 // 3. If they are good, we write a cookie and then redirect to the /urls
 // 4. Else, then we res.send("Sorry the username or password does not match")
+
+// app.get("/logout", (req, res) => {
+//   const templateVars = {
+//     email: "",
+//     username: req.cookies.username
+//   };
+//   res.render("urls_login", templateVars);
+//   }
+// );
+
+app.post("/logout", (req, res) => {
+  res.clearCookie("username");
+  res.redirect("/urls");
+});
