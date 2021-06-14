@@ -22,7 +22,7 @@ const users = {
     password: "1"
   },
   "Kakao": {
-    id: "kaka0User1", 
+    id: "kaka0User1",
     email: "2@2.com", 
     password: "2"
   }
@@ -65,7 +65,8 @@ app.post("/urls", (req, res) => {
   res.send("Ok"); // Respond with 'Ok' (we will replace this)
 });
 
-app.get("/u/:shortURL", (req, res) => {
+// app.get("/u/:shortURL", (req, res) => {
+  app.get("/urls/:shortURL", (req, res) => {
   // make this more dynamic instead of hard coding
   const templateVars = {
     shortURL: req.params.shortURL,
@@ -75,7 +76,8 @@ app.get("/u/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-app.get("/u/:shortURL", (req, res) => {
+// app.get("/u/:shortURL", (req, res) => {
+  app.get("/urls/:shortURL", (req, res) => {
   // const longURL = ...
   res.redirect(longURL);
 });
@@ -92,21 +94,29 @@ function generateRandomString() {
 };
 
 app.get("/register", (req, res) => {
+  // if (userExists) {
+  //   res.redirect("/urls");
+  // } else {
   const templateVars = {
     email: "",
     username: req.cookies.username
   };
   res.render("urls_register", templateVars);
-  }
-);
+  // }
+});
 
 app.post("/register", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   const id = generateRandomString(8)
   console.log("email=", email, "password", password)
-  if (!email || !password) {
-    res.send ("Please enter a valid email and password");
+  if (email === "" || password === "") {
+    res.send("400 Bad Request");
+  } else if (users.email || users.password) {
+    res.send("The following account already exists");
+  // }
+  // if (!email || !password) {
+  //   res.send ("Please enter a valid email and password");
   } else {
     users[id] = {
       id,
@@ -136,9 +146,12 @@ app.post("/login", (req, res) => {
   const username = req.body.username;
   res.cookie("username", username);
   console.log(username);
-  // const email = req.body.email;
-  // const password = req.body.password;
-  // console.log("email=", email, "password", password)
+  const email = req.body.email;
+  const password = req.body.password;
+  console.log("email=", email, "password", password)
+  if (email === "" || password === "") {
+    res.send("Error 400 Bad Request");
+  }
   // if (!email || !password) {
   //   res.send ("Please enter your username and password");
   // }
