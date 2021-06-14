@@ -1,5 +1,5 @@
 const express = require("express");
-// const bodyParser = require("body-parser");
+const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const app = express();
 const PORT = 8080; // default port 8080
@@ -7,7 +7,7 @@ const PORT = 8080; // default port 8080
 app.set("view engine", "ejs");
 
 app.use(express.urlencoded({extended: true}));
-// app.use(bodyParser());
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 
 const urlDatabase = {
@@ -70,7 +70,7 @@ app.post("/urls", (req, res) => {
   // make this more dynamic instead of hard coding
   const templateVars = {
     shortURL: req.params.shortURL,
-    longURL: "http://localhost:8080/urls/b2xVn2",
+    longURL: urlDatabase[req.params.shortURL].longURL,
     username: req.cookies.username
   };
   res.render("urls_show", templateVars);
