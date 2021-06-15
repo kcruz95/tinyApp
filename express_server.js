@@ -11,8 +11,9 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", users: "Dimitriy" },
+  "9sm5xK": { longURL: "http://www.google.com", users: "Dimitriy" },
+  
 };
 
 function generateRandomString() {
@@ -68,20 +69,27 @@ app.get("/urls", (req, res) => {
     urls: urlDatabase,
     username: req.cookies.username
   };
+  console.log(templateVars);
   res.render("urls_index", templateVars);
 });
 
 app.post("/urls", (req, res) => {
   console.log(req.body); // Log the POST request body to the console
+  const shortURL = generateRandomString();
+  urlDatabase[shortURL] = {
+    longURL: req.body.longURL,
+    username: req.cookies.username
+  }
+  res.redirect(`urls/${shortURL}`)
   res.send("Ok"); // Respond with 'Ok' (we will replace this)
 });
 
-// app.get("/u/:shortURL", (req, res) => {
-app.get("/urls/:shortURL", (req, res) => {
+app.get("/u/:shortURL", (req, res) => {
+// app.get("/urls/:shortURL", (req, res) => {
   // make this more dynamic instead of hard coding
   const templateVars = {
     shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL].longURL,
+    longURL: urlDatabase[req.params.shortURL],
     username: req.cookies.username
   };
   res.render("urls_show", templateVars);
@@ -89,7 +97,7 @@ app.get("/urls/:shortURL", (req, res) => {
 
 // app.get("/u/:shortURL", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
-  // const longURL = ...
+  const longURL = urlDatabase[req.params.shortURL].longURL;
   res.redirect(longURL);
 });
 
