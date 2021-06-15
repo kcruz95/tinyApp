@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
+const bcryptjs = require("bcryptjs");
 const app = express();
 const PORT = 8080; // default port 8080
 
@@ -120,20 +121,42 @@ app.get("/register", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
-  const email = req.body.email;
-  const password = req.body.password;
+  const newEmail = req.body.email;
+  const newPassword = req.body.password;
   console.log("email=", email, "password", password);
   
   // if submission fields are blank
   if (!email || !password) {
     return res.status(400).send("400 Bad Request. Enter a valid email and password");
+  } else {
+  
+  // pseudo if user email/pwd already exists
+
+  const newUserId = generateRandomString(8);
+  users[newUserId] = {
+    id: newUserId,
+    email: newEmail,
+    password: bcrypt.hashSync(newPassword, 8),
   }
 
-  // pseudo if user email/pwd already exists
-  const 
-if (findUsersByKey(users, "email", email)) {
-  return res.status(400).send("400 Bad Request. Account already exists!");
-}
+  const bcrypt = require('bcrypt');
+  const saltRounds = 8;
+  const plainPwd = "";
+  const plainPwd2 = "";
+  
+  // users[id] = {
+  //   id,
+  //   email,
+  //   password
+  // }
+};
+
+  //   for ( user in users) {
+    //     console.log(`${user}: ${users[user]}`);
+//     if (userExists(users, "email", email)) {
+//   return res.status(400).send("400 Bad Request. Account already exists!");
+// }
+// }
 
 console.log(users.email);
     
@@ -144,18 +167,6 @@ console.log(users.email);
   // }
   
   // if (!email && email !== "") {
-    const id = generateRandomString(8);
-
-    const bcrypt = require('bcrypt');
-    const saltRounds = 8;
-    const plainPwd = "";
-    const plainPwd2 = "";
-
-    users[id] = {
-      id,
-      email,
-      password
-    };
 
     res.cookie("userId", id);
     
