@@ -15,26 +15,26 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
-const users = { 
+const users = {
   "Dimitriy": {
-    id: "dm3", 
-    email: "1@1.com", 
+    id: "dm3",
+    email: "1@1.com",
     password: "1"
   },
   "Kakao": {
     id: "kaka0User1",
-    email: "2@2.com", 
+    email: "2@2.com",
     password: "2"
   }
-}
+};
 
-const emailChecker =(email, users) => {
+const emailChecker = (email, users) => {
   for (let user in users) {
     if (email === users[user].email) {
       return users[user];
     }
   } return false;
-}
+};
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
@@ -44,20 +44,20 @@ app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
- app.get("/urls/new", (req, res) => {
+app.get("/urls/new", (req, res) => {
   const templateVars = {
     urls: urlDatabase,
     username: req.cookies.username
   };
-    res.render("urls_new", templateVars);
+  res.render("urls_new", templateVars);
 });
 
- app.get("/urls", (req, res) => {
+app.get("/urls", (req, res) => {
   const templateVars = {
     urls: urlDatabase,
     username: req.cookies.username
   };
-    res.render("urls_index", templateVars);
+  res.render("urls_index", templateVars);
 });
 
 app.post("/urls", (req, res) => {
@@ -66,7 +66,7 @@ app.post("/urls", (req, res) => {
 });
 
 // app.get("/u/:shortURL", (req, res) => {
-  app.get("/urls/:shortURL", (req, res) => {
+app.get("/urls/:shortURL", (req, res) => {
   // make this more dynamic instead of hard coding
   const templateVars = {
     shortURL: req.params.shortURL,
@@ -77,7 +77,7 @@ app.post("/urls", (req, res) => {
 });
 
 // app.get("/u/:shortURL", (req, res) => {
-  app.get("/urls/:shortURL", (req, res) => {
+app.get("/urls/:shortURL", (req, res) => {
   // const longURL = ...
   res.redirect(longURL);
 });
@@ -91,7 +91,7 @@ function generateRandomString() {
     result += inputChars.charAt(Math.floor(Math.random() * charLength));
   }
   return result;
-};
+}
 
 app.get("/register", (req, res) => {
   // if (userExists) {
@@ -108,8 +108,8 @@ app.get("/register", (req, res) => {
 app.post("/register", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  const id = generateRandomString(8)
-  console.log("email=", email, "password", password)
+  const id = generateRandomString(8);
+  console.log("email=", email, "password", password);
   if (email === "" || password === "") {
     res.send("400 Bad Request");
   } else if (users.email || users.password) {
@@ -139,7 +139,7 @@ app.get("/login", (req, res) => {
     username: req.cookies.username
   };
   res.render("urls_login", templateVars);
-  }
+}
 );
 
 app.post("/login", (req, res) => {
@@ -148,7 +148,7 @@ app.post("/login", (req, res) => {
   console.log(username);
   const email = req.body.email;
   const password = req.body.password;
-  console.log("email=", email, "password", password)
+  console.log("email=", email, "password", password);
   if (email === "" || password === "") {
     res.send("Error 400 Bad Request");
   }
@@ -162,7 +162,7 @@ app.post("/login", (req, res) => {
   //   } else {
   //     res.send("Incorrect password!");
   //   }
-  // } 
+  // }
 
   res.redirect("/urls");
 });
