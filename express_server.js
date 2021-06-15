@@ -15,6 +15,17 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+function generateRandomString() {
+  let result = "";
+  const inputChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  const charLength = inputChars.length;
+  const length = 8;
+  for (i = 0; i < length; i = i + 1) {
+    result += inputChars.charAt(Math.floor(Math.random() * charLength));
+  }
+  return result;
+}
+
 const users = {
   "Dimitriy": {
     id: "dm3",
@@ -81,17 +92,6 @@ app.get("/urls/:shortURL", (req, res) => {
   // const longURL = ...
   res.redirect(longURL);
 });
-
-function generateRandomString() {
-  let result = "";
-  const inputChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  const charLength = inputChars.length;
-  const length = 8;
-  for (i = 0; i < length; i = i + 1) {
-    result += inputChars.charAt(Math.floor(Math.random() * charLength));
-  }
-  return result;
-}
 
 app.get("/register", (req, res) => {
   // if (userExists) {
