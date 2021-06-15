@@ -11,8 +11,8 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 
 const urlDatabase = {
-  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", users: "Dimitriy" },
-  "9sm5xK": { longURL: "http://www.google.com", users: "Dimitriy" },
+  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", users: "dm3" },
+  "9sm5xK": { longURL: "http://www.google.com", users: "dm3" },
   
 };
 
@@ -28,13 +28,13 @@ function generateRandomString() {
 }
 
 const users = {
-  "Dimitriy": {
+  "dm3": {
     id: "dm3",
     email: "1@1.com",
     password: "1"
   },
   "Kakao": {
-    id: "kaka0User1",
+    id: "Kakao",
     email: "2@2.com",
     password: "2"
   }
@@ -64,12 +64,16 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", templateVars);
 });
 
+// app.get("/login", (req, res) => {
+//   if (!loggedIn (req.cookies.username))
+// });
+
 app.get("/urls", (req, res) => {
   const templateVars = {
     urls: urlDatabase,
     username: req.cookies.username
   };
-  console.log(templateVars);
+  // console.log(templateVars);
   res.render("urls_index", templateVars);
 });
 
@@ -107,9 +111,6 @@ app.get("/u/:shortURL", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  // if (userExists) {
-  //   res.redirect("/urls");
-  // } else {
   const templateVars = {
     email: "",
     username: req.cookies.username
@@ -125,14 +126,17 @@ app.post("/register", (req, res) => {
   
   // if submission fields are blank
   if (!email || !password) {
-    // res.status(400);
-    return res.send("400 Bad Request. Enter a valid email and password");
+    return res.status(400).send("400 Bad Request. Enter a valid email and password");
   }
 
   // pseudo if user email/pwd already exists
-    for ( user in urlDatabase) {
+  const 
+if (findUsersByKey(users, "email", email)) {
+  return res.status(400).send("400 Bad Request. Account already exists!");
+}
 
-    }
+console.log(users.email);
+    
   // const userExists = ;
   // if (userExists(email, users)) {
   //   res.status(400);
@@ -141,19 +145,24 @@ app.post("/register", (req, res) => {
   
   // if (!email && email !== "") {
     const id = generateRandomString(8);
+
+    const bcrypt = require('bcrypt');
+    const saltRounds = 8;
+    const plainPwd = "";
+    const plainPwd2 = "";
+
     users[id] = {
       id,
       email,
       password
     };
-    
+
     res.cookie("userId", id);
     
   // }
   res.redirect("/urls");
 }
 );
-
 
 //assign user obj info it needs (userid for key)
 // res.send("Incorrect password!");
@@ -169,29 +178,31 @@ app.get("/login", (req, res) => {
 
 app.post("/login", (req, res) => {
   const username = req.body.username;
-  res.cookie("username", username);
-  console.log(username);
+  // console.log(username);
   const email = req.body.email;
   const password = req.body.password;
-  console.log("email=", email, "password", password);
+  // const { email, password } = req.body; simplified version of lines 177 & 178
+  // console.log("email=", email, "password", password);
   if (email === "" || password === "") {
     res.send("Error 400 Bad Request");
   }
-  // if (!email || !password) {
-    //   res.send ("Please enter your username and password");
-    // }
-    // if (email && password) {
-      //   const user = emailChecker(email, users);
-      //   if (password === user.password) {
-        //     res.cookie("userId", user.id);
-        //   } else {
-          //     res.send("Incorrect password!");
-          //   }
-          // }
-          
-          res.redirect("/urls");
-        });
-        
+  
+  res.cookie("username", username);
+  res.redirect("/urls");
+});
+
+// if (!email || !password) {
+  //   res.send ("Please enter your username and password");
+  // }
+  // if (email && password) {
+    //   const user = emailChecker(email, users);
+    //   if (password === user.password) {
+      //     res.cookie("userId", user.id);
+      //   } else {
+        //     res.send("Incorrect password!");
+        //   }
+        // }
+
         //POST Login
 // 1. We are going to receive the email and password
 // 2. We will validate and check the email and password in the UsersDatabase that they exist and are ok.
