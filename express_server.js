@@ -81,11 +81,17 @@ app.post("/urls", (req, res) => {
     username: req.cookies.username
   }
   res.redirect(`urls/${shortURL}`)
-  res.send("Ok"); // Respond with 'Ok' (we will replace this)
+  // res.send("Ok"); // Respond with 'Ok' (we will replace this)
 });
 
-app.get("/u/:shortURL", (req, res) => {
-// app.get("/urls/:shortURL", (req, res) => {
+app.post("/urls/:shortURL/delete", (req, res) => {
+  const shortURL = req.params.shortURL;
+  delete urlDatabase[shortURL];
+  console.log(shortURL);
+  res.redirect("/urls")
+});
+
+app.get("/urls/:shortURL", (req, res) => {
   // make this more dynamic instead of hard coding
   const templateVars = {
     shortURL: req.params.shortURL,
@@ -95,8 +101,7 @@ app.get("/u/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-// app.get("/u/:shortURL", (req, res) => {
-app.get("/urls/:shortURL", (req, res) => {
+app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL].longURL;
   res.redirect(longURL);
 });
@@ -116,16 +121,26 @@ app.get("/register", (req, res) => {
 app.post("/register", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  const id = generateRandomString(8);
   console.log("email=", email, "password", password);
-  if (email === "" || password === "") {
-    res.send("400 Bad Request");
-  } else if (users.email || users.password) {
-    res.send("The following account already exists");
+  
+  // if submission fields are blank
+  if (!email || !password) {
+    // res.status(400);
+    return res.send("400 Bad Request. Enter a valid email and password");
+  }
+
+  // pseudo if user email/pwd already exists
+    for ( user in urlDatabase) {
+
+    }
+  // const userExists = ;
+  // if (userExists(email, users)) {
+  //   res.status(400);
+  //   res.send("400 Bad Request. The following account already exists");
   // }
-  // if (!email || !password) {
-  //   res.send ("Please enter a valid email and password");
-  } else {
+  
+  // if (!email && email !== "") {
+    const id = generateRandomString(8);
     users[id] = {
       id,
       email,
@@ -133,13 +148,15 @@ app.post("/register", (req, res) => {
     };
     
     res.cookie("userId", id);
-
-    res.redirect("/urls");
-    //assign user obj info it needs (userid for key)
-    // res.send("Incorrect password!");
-  }
+    
+  // }
+  res.redirect("/urls");
 }
 );
+
+
+//assign user obj info it needs (userid for key)
+// res.send("Incorrect password!");
 
 app.get("/login", (req, res) => {
   const templateVars = {
@@ -161,21 +178,21 @@ app.post("/login", (req, res) => {
     res.send("Error 400 Bad Request");
   }
   // if (!email || !password) {
-  //   res.send ("Please enter your username and password");
-  // }
-  // if (email && password) {
-  //   const user = emailChecker(email, users);
-  //   if (password === user.password) {
-  //     res.cookie("userId", user.id);
-  //   } else {
-  //     res.send("Incorrect password!");
-  //   }
-  // }
-
-  res.redirect("/urls");
-});
-
-//POST Login
+    //   res.send ("Please enter your username and password");
+    // }
+    // if (email && password) {
+      //   const user = emailChecker(email, users);
+      //   if (password === user.password) {
+        //     res.cookie("userId", user.id);
+        //   } else {
+          //     res.send("Incorrect password!");
+          //   }
+          // }
+          
+          res.redirect("/urls");
+        });
+        
+        //POST Login
 // 1. We are going to receive the email and password
 // 2. We will validate and check the email and password in the UsersDatabase that they exist and are ok.
 // 3. If they are good, we write a cookie and then redirect to the /urls
