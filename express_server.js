@@ -1,7 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
-const bcryptjs = require("bcryptjs");
+const bcrypt = require("bcryptjs");
 const app = express();
 const PORT = 8080; // default port 8080
 
@@ -32,6 +32,7 @@ const users = {
   "dm3": {
     id: "dm3",
     email: "1@1.com",
+    //change to 'hash' later (ln 141)
     password: "1"
   },
   "Kakao": {
@@ -74,7 +75,6 @@ app.get("/urls", (req, res) => {
     urls: urlDatabase,
     username: req.cookies.username
   };
-  // console.log(templateVars);
   res.render("urls_index", templateVars);
 });
 
@@ -121,57 +121,28 @@ app.get("/register", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
-  const newEmail = req.body.email;
-  const newPassword = req.body.password;
+  const email = req.body.email;
+  const password = req.body.password;
   console.log("email=", email, "password", password);
-  
-  // if submission fields are blank
   if (!email || !password) {
     return res.status(400).send("400 Bad Request. Enter a valid email and password");
+  } else if (email) {
+    return res.status(400).send(`400 Bad Request. ${email} is already registered. Please use it to log in.`);
   } else {
-  
-  // pseudo if user email/pwd already exists
-
-  const newUserId = generateRandomString(8);
-  users[newUserId] = {
-    id: newUserId,
-    email: newEmail,
-    password: bcrypt.hashSync(newPassword, 8),
-  }
-
-  const bcrypt = require('bcrypt');
-  const saltRounds = 8;
-  const plainPwd = "";
-  const plainPwd2 = "";
-  
-  // users[id] = {
-  //   id,
-  //   email,
-  //   password
-  // }
+bcrypt.genSalt(10, (err, salt) => {
+  bcrypt.hash(password, salt, (err, hash) => {
+    const newUserId = generateRandomString(8);
+    const newUser = {
+      id: newUserId,
+      email: email,
+      password: hash
+    }
+    users[newUserId] = newUser;
+      console.log(users);
+    })
+  })
 };
-
-  //   for ( user in users) {
-    //     console.log(`${user}: ${users[user]}`);
-//     if (userExists(users, "email", email)) {
-//   return res.status(400).send("400 Bad Request. Account already exists!");
-// }
-// }
-
-console.log(users.email);
-    
-  // const userExists = ;
-  // if (userExists(email, users)) {
-  //   res.status(400);
-  //   res.send("400 Bad Request. The following account already exists");
-  // }
-  
-  // if (!email && email !== "") {
-
-    res.cookie("userId", id);
-    
-  // }
-  res.redirect("/urls");
+  res.redirect("/login");
 }
 );
 
@@ -213,12 +184,6 @@ app.post("/login", (req, res) => {
         //     res.send("Incorrect password!");
         //   }
         // }
-
-        //POST Login
-// 1. We are going to receive the email and password
-// 2. We will validate and check the email and password in the UsersDatabase that they exist and are ok.
-// 3. If they are good, we write a cookie and then redirect to the /urls
-// 4. Else, then we res.send("Sorry the username or password does not match")
 
 // app.get("/logout", (req, res) => {
 //   const templateVars = {
