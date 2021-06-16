@@ -12,10 +12,8 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 
 const urlDatabase = {
-  // "b2xVn2": { longURL: "http://www.lighthouselabs.ca", users: "dm3" },
-  // "9sm5xK": { longURL: "http://www.google.com", users: "dm3" },
-  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "dm3" },
-  i3BoGr: { longURL: "https://www.google.ca", userID: "dm3" }
+  b6UTxQ: { longURL: "https://www.tsn.ca", user_id: "dm3" },
+  i3BoGr: { longURL: "https://www.google.ca", user_id: "dm3" }
 
 };
 
@@ -73,9 +71,17 @@ app.get("/urls/new", (req, res) => {
 });
   
   app.get("/urls", (req, res) => {
+    const urlsForUser = (user_id, urlDatabase) => {
+
+    };
+    const regUserUrls = Object.keys(urlsForUser(user_id, urlDatabase));
+      if (!regUserUrls.includes(req.params.shortURL)) {
+        return res.status(401).send("Error 401. You are unauthorised to make changes here. Log in in order to do so.");
+      }
     const templateVars = {
-      urls: urlDatabase,
-      user_id: req.cookies.user_id
+      user_id: req.cookies.user_id,
+      urls: urlsForUser(urlDatabase, user_id),
+      user: users[req.cookies.user_id]
     };
     res.render("urls_index", templateVars);
   });
@@ -85,10 +91,9 @@ app.get("/urls/new", (req, res) => {
     const shortURL = generateRandomString();
     urlDatabase[shortURL] = {
       longURL: req.body.longURL,
-      user_id: req.cookies.user_id
+      user_id: req.cookies.user_id,
     }
     res.redirect(`urls/${shortURL}`)
-    // res.send("Ok"); // Respond with 'Ok' (we will replace this)
   });
   
   app.post("/urls/:shortURL/delete", (req, res) => {
