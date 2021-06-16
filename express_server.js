@@ -30,16 +30,24 @@ function generateRandomString() {
 
 const users = {
   "dm3": {
-    id: "dm3",
+    user_id: "dm3",
     email: "1@1.com",
     //change to 'hash' later (ln 141)
     password: "1"
   },
   "Kakao": {
-    id: "Kakao",
+    user_id: "Kakao",
     email: "2@2.com",
     password: "2"
   }
+};
+
+const emailChecker = (email, users) => {
+  for (let user in users) {
+    if (email === users[user].email) {
+      return users[user];
+    }
+  } return false;
 };
 
 app.listen(PORT, () => {
@@ -53,19 +61,15 @@ app.get("/urls.json", (req, res) => {
 app.get("/urls/new", (req, res) => {
   const templateVars = {
     urls: urlDatabase,
-    username: req.cookies.username
+    user_id: req.cookies.user_id
   };
   res.render("urls_new", templateVars);
 });
-
-// app.get("/login", (req, res) => {
-  //   if (!loggedIn (req.cookies.username))
-  // });
   
   app.get("/urls", (req, res) => {
     const templateVars = {
       urls: urlDatabase,
-      username: req.cookies.username
+      user_id: req.cookies.user_id
     };
     res.render("urls_index", templateVars);
   });
@@ -75,7 +79,7 @@ app.get("/urls/new", (req, res) => {
     const shortURL = generateRandomString();
     urlDatabase[shortURL] = {
       longURL: req.body.longURL,
-      username: req.cookies.username
+      user_id: req.cookies.user_id
     }
     res.redirect(`urls/${shortURL}`)
     // res.send("Ok"); // Respond with 'Ok' (we will replace this)
@@ -93,7 +97,7 @@ app.get("/urls/new", (req, res) => {
     const templateVars = {
       shortURL: req.params.shortURL,
       longURL: urlDatabase[req.params.shortURL],
-      username: req.cookies.username
+      user_id: req.cookies.user_id
     };
     res.render("urls_show", templateVars);
   });
@@ -105,21 +109,20 @@ app.get("/urls/new", (req, res) => {
   
   app.get("/register", (req, res) => {
     const templateVars = {
-      email: "",
-      username: req.cookies.username
+      user_id: req.cookies["user_id"],
     };
-    res.cookie("username", username);
     res.render("urls_register", templateVars);
   });
   
   app.post("/register", (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
+    const user_id = generateRandomString(8);
     console.log("email=", email, "password", password);
     
     if (!email || !password) {
       return res.status(400).send("400 Bad Request. Enter a valid email and password");
-    } else if (email) {
+    } else if (emailChecker(email, users)) {
       return res.status(400).send(`400 Bad Request. ${email} is already registered. Please use it to log in.`);
     } else {
       bcrypt.genSalt(10, (err, salt) => {
@@ -135,7 +138,8 @@ app.get("/urls/new", (req, res) => {
         })
       })
     };
-    res.cookie("username", username);
+    res.cookie("user_id", user_id);
+    console.log("1111", res.cookie);
     res.redirect("/login");
   }
   );
@@ -146,57 +150,39 @@ app.get("/urls/new", (req, res) => {
   app.get("/login", (req, res) => {
     const templateVars = {
       email: "",
-      username: req.cookies.username
+      user_id: req.cookies.user_id
     };
+    console.log("159", req.cookies);
     res.render("urls_login", templateVars);
-    res.cookie("username", username);
+    req.cookies("user_id", user_id);
   }
+  
   );
   
   app.post("/login", (req, res) => {
-    const username = req.body.username;
+    const user_id = req.cookies;
     const email = req.body.email;
     const password = req.body.password;
-    // const { email, password } = req.body; simplified version of lines 177 & 178
-    // console.log("email=", email, "password", password);
-    if (email === "" || password === "") {
-      res.send("Error 400 Bad Request. Please enter your username and password");
-      return res.redirect("/login");
-    } if (email && !password) {
-      return res.status(403).send(`Please input correct password.`);
+    if (!email || !password) {
+      console.log("line 170", email, password);
+      res.status(403).send("Error 403 Bad Request. Please enter your user_id and password");
+    } else if (!emailChecker(email, users)) {
+      res.status(403).send("Error 403 Bad Request. Email not registered.");
+    } else {
+      const user = emailChecker (email, users)
+        if (password === user.password) {
+          console.log("HERE");
+          res.cookie("user_id", user.user_id);
+          console.log("176", res.cookie);
+          res.redirect("/urls");
+        } else {
+          res.status(403).send("Error 403 Bad Request. Incorrect Password!");
+        }
     }
-      res.cookie("username", username);
-      return res.redirect("/urls");
-    
-  });
-
-  const emailChecker = (email, users) => {
-    for (let user in users) {
-      if (email === users[user].email) {
-        return users[user];
-      }
-    } return false;
-  };
-
-  // if (email && password) {
-    //   const user = emailChecker(email, users);
-    //   if (password === user.password) {
-      //     res.cookie("userId", user.id);
-      //   } else {
-        //     res.send("Incorrect password!");
-        //   }
-        // }
-        
-        // app.get("/logout", (req, res) => {
-          //   const templateVars = {
-            //     email: "",
-            //     username: req.cookies.username
-            //   };
-            //   res.render("urls_login", templateVars);
-            //   }
-            // );
+   
+    });
             
-            app.post("/logout", (req, res) => {
-              res.clearCookie("username");
-              res.redirect("/urls");
+  app.post("/logout", (req, res) => {
+    res.clearCookie("user_id");
+    res.redirect("/urls");
 });

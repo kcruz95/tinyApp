@@ -12,7 +12,7 @@
     </div>
     
     <div>
-      <% if(!username) { %>
+      <% if(!user_id) { %>
         <form method="GET" action="/login">
           <a class="btn btn-primary"><button>Log In</button></a>
         </form>
@@ -21,9 +21,9 @@
         </form>
       <% } else { %>
         <p>
-          You're logged in as: <%= username %>
+          You're logged in as: <%= user_id %>
         </p>
-        <form method="POST" action="/logout"> -->
+        <form method="POST" action="/logout">
           <a class="btn btn-primary"><button>Log Out</button></a>
         </form>
       <% } %>
