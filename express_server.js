@@ -108,8 +108,8 @@ app.get("/urls/new", (req, res) => {
       email: "",
       username: req.cookies.username
     };
-    res.render("urls_register", templateVars);
     res.cookie("username", username);
+    res.render("urls_register", templateVars);
   });
   
   app.post("/register", (req, res) => {
@@ -135,8 +135,8 @@ app.get("/urls/new", (req, res) => {
         })
       })
     };
-    res.redirect("/login");
     res.cookie("username", username);
+    res.redirect("/login");
   }
   );
   
@@ -160,14 +160,13 @@ app.get("/urls/new", (req, res) => {
     // const { email, password } = req.body; simplified version of lines 177 & 178
     // console.log("email=", email, "password", password);
     if (email === "" || password === "") {
-      return res.send("Error 400 Bad Request. Please enter your username and password");
-      // 
+      res.send("Error 400 Bad Request. Please enter your username and password");
+      return res.redirect("/login");
     } if (email && !password) {
       return res.status(403).send(`Please input correct password.`);
     }
       res.cookie("username", username);
-
-    return res.redirect("/urls");
+      return res.redirect("/urls");
     
   });
 
