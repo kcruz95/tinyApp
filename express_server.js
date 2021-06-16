@@ -42,14 +42,6 @@ const users = {
   }
 };
 
-const emailChecker = (email, users) => {
-  for (let user in users) {
-    if (email === users[user].email) {
-      return users[user];
-    }
-  } return false;
-};
-
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
@@ -67,115 +59,125 @@ app.get("/urls/new", (req, res) => {
 });
 
 // app.get("/login", (req, res) => {
-//   if (!loggedIn (req.cookies.username))
-// });
-
-app.get("/urls", (req, res) => {
-  const templateVars = {
-    urls: urlDatabase,
-    username: req.cookies.username
-  };
-  res.render("urls_index", templateVars);
-});
-
-app.post("/urls", (req, res) => {
-  console.log(req.body); // Log the POST request body to the console
-  const shortURL = generateRandomString();
-  urlDatabase[shortURL] = {
-    longURL: req.body.longURL,
-    username: req.cookies.username
-  }
-  res.redirect(`urls/${shortURL}`)
-  // res.send("Ok"); // Respond with 'Ok' (we will replace this)
-});
-
-app.post("/urls/:shortURL/delete", (req, res) => {
-  const shortURL = req.params.shortURL;
-  delete urlDatabase[shortURL];
-  console.log(shortURL);
-  res.redirect("/urls")
-});
-
-app.get("/urls/:shortURL", (req, res) => {
-  // make this more dynamic instead of hard coding
-  const templateVars = {
-    shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL],
-    username: req.cookies.username
-  };
-  res.render("urls_show", templateVars);
-});
-
-app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL].longURL;
-  res.redirect(longURL);
-});
-
-app.get("/register", (req, res) => {
-  const templateVars = {
-    email: "",
-    username: req.cookies.username
-  };
-  res.render("urls_register", templateVars);
-  // }
-});
-
-app.post("/register", (req, res) => {
-  const email = req.body.email;
-  const password = req.body.password;
-  console.log("email=", email, "password", password);
-  if (!email || !password) {
-    return res.status(400).send("400 Bad Request. Enter a valid email and password");
-  } else if (email) {
-    return res.status(400).send(`400 Bad Request. ${email} is already registered. Please use it to log in.`);
-  } else {
-bcrypt.genSalt(10, (err, salt) => {
-  bcrypt.hash(password, salt, (err, hash) => {
-    const newUserId = generateRandomString(8);
-    const newUser = {
-      id: newUserId,
-      email: email,
-      password: hash
-    }
-    users[newUserId] = newUser;
-      console.log(users);
-    })
-  })
-};
-  res.redirect("/login");
-}
-);
-
-//assign user obj info it needs (userid for key)
-// res.send("Incorrect password!");
-
-app.get("/login", (req, res) => {
-  const templateVars = {
-    email: "",
-    username: req.cookies.username
-  };
-  res.render("urls_login", templateVars);
-}
-);
-
-app.post("/login", (req, res) => {
-  const username = req.body.username;
-  // console.log(username);
-  const email = req.body.email;
-  const password = req.body.password;
-  // const { email, password } = req.body; simplified version of lines 177 & 178
-  // console.log("email=", email, "password", password);
-  if (email === "" || password === "") {
-    res.send("Error 400 Bad Request");
-  }
+  //   if (!loggedIn (req.cookies.username))
+  // });
   
-  res.cookie("username", username);
-  res.redirect("/urls");
-});
+  app.get("/urls", (req, res) => {
+    const templateVars = {
+      urls: urlDatabase,
+      username: req.cookies.username
+    };
+    res.render("urls_index", templateVars);
+  });
+  
+  app.post("/urls", (req, res) => {
+    console.log(req.body); // Log the POST request body to the console
+    const shortURL = generateRandomString();
+    urlDatabase[shortURL] = {
+      longURL: req.body.longURL,
+      username: req.cookies.username
+    }
+    res.redirect(`urls/${shortURL}`)
+    // res.send("Ok"); // Respond with 'Ok' (we will replace this)
+  });
+  
+  app.post("/urls/:shortURL/delete", (req, res) => {
+    const shortURL = req.params.shortURL;
+    delete urlDatabase[shortURL];
+    console.log(shortURL);
+    res.redirect("/urls")
+  });
+  
+  app.get("/urls/:shortURL", (req, res) => {
+    // make this more dynamic instead of hard coding
+    const templateVars = {
+      shortURL: req.params.shortURL,
+      longURL: urlDatabase[req.params.shortURL],
+      username: req.cookies.username
+    };
+    res.render("urls_show", templateVars);
+  });
+  
+  app.get("/u/:shortURL", (req, res) => {
+    const longURL = urlDatabase[req.params.shortURL].longURL;
+    res.redirect(longURL);
+  });
+  
+  app.get("/register", (req, res) => {
+    const templateVars = {
+      email: "",
+      username: req.cookies.username
+    };
+    res.cookie("username", "username");
+    res.render("urls_register", templateVars);
+  });
+  
+  app.post("/register", (req, res) => {
+    const email = req.body.email;
+    const password = req.body.password;
+    console.log("email=", email, "password", password);
+    
+    if (!email || !password) {
+      return res.status(400).send("400 Bad Request. Enter a valid email and password");
+    } else if (email) {
+      return res.status(400).send(`400 Bad Request. ${email} is already registered. Please use it to log in.`);
+    } else {
+      bcrypt.genSalt(10, (err, salt) => {
+        bcrypt.hash(password, salt, (err, hash) => {
+          const newUserId = generateRandomString(8);
+          const newUser = {
+            id: newUserId,
+            email: email,
+            password: hash
+          }
+          users[newUserId] = newUser;
+          console.log(users);
+        })
+      })
+    };
+    res.cookie("username", "username");
+    res.redirect("/login");
+  }
+  );
+  
+  //assign user obj info it needs (userid for key)
+  // res.send("Incorrect password!");
+  
+  app.get("/login", (req, res) => {
+    const templateVars = {
+      email: "",
+      username: req.cookies.username
+    };
+    res.cookie("username", "username");
+    res.render("urls_login", templateVars);
+  }
+  );
+  
+  app.post("/login", (req, res) => {
+    // const username = req.body.username;
+    const email = req.body.email;
+    const password = req.body.password;
+    // const { email, password } = req.body; simplified version of lines 177 & 178
+    // console.log("email=", email, "password", password);
+    if (email === "" || password === "") {
+      return res.send("Error 400 Bad Request. Please enter your username and password");
+      // 
+    } if (email && !password) {
+      return res.status(403).send(`Please input correct password.`);
+    }
+    res.cookie("username", "username");
+    return res.redirect("/urls");
+    
+  });
 
-// if (!email || !password) {
-  //   res.send ("Please enter your username and password");
-  // }
+  const emailChecker = (email, users) => {
+    for (let user in users) {
+      if (email === users[user].email) {
+        return users[user];
+      }
+    } return false;
+  };
+
   // if (email && password) {
     //   const user = emailChecker(email, users);
     //   if (password === user.password) {
@@ -184,17 +186,17 @@ app.post("/login", (req, res) => {
         //     res.send("Incorrect password!");
         //   }
         // }
-
-// app.get("/logout", (req, res) => {
-//   const templateVars = {
-//     email: "",
-//     username: req.cookies.username
-//   };
-//   res.render("urls_login", templateVars);
-//   }
-// );
-
-app.post("/logout", (req, res) => {
-  res.clearCookie("username");
-  res.redirect("/urls");
+        
+        // app.get("/logout", (req, res) => {
+          //   const templateVars = {
+            //     email: "",
+            //     username: req.cookies.username
+            //   };
+            //   res.render("urls_login", templateVars);
+            //   }
+            // );
+            
+            app.post("/logout", (req, res) => {
+              res.clearCookie("username");
+              res.redirect("/urls");
 });
