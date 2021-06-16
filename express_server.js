@@ -108,8 +108,8 @@ app.get("/urls/new", (req, res) => {
       email: "",
       username: req.cookies.username
     };
-    res.cookie("username", "username");
     res.render("urls_register", templateVars);
+    res.cookie("username", username);
   });
   
   app.post("/register", (req, res) => {
@@ -135,8 +135,8 @@ app.get("/urls/new", (req, res) => {
         })
       })
     };
-    res.cookie("username", "username");
     res.redirect("/login");
+    res.cookie("username", username);
   }
   );
   
@@ -148,13 +148,13 @@ app.get("/urls/new", (req, res) => {
       email: "",
       username: req.cookies.username
     };
-    res.cookie("username", "username");
     res.render("urls_login", templateVars);
+    res.cookie("username", username);
   }
   );
   
   app.post("/login", (req, res) => {
-    // const username = req.body.username;
+    const username = req.body.username;
     const email = req.body.email;
     const password = req.body.password;
     // const { email, password } = req.body; simplified version of lines 177 & 178
@@ -165,7 +165,8 @@ app.get("/urls/new", (req, res) => {
     } if (email && !password) {
       return res.status(403).send(`Please input correct password.`);
     }
-    res.cookie("username", "username");
+      res.cookie("username", username);
+
     return res.redirect("/urls");
     
   });
